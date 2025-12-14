@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
+  ArrowRight,
   Check,
-  ExternalLink,
   Loader2,
   Plus,
   Sparkles,
@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
+import { useEditor } from '@/contexts/EditorContext';
 
 const connectedPlatforms = [
   {
@@ -52,6 +53,7 @@ export function RightPanel() {
   const [aiPrompt, setAiPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedContent, setGeneratedContent] = useState('');
+  const { sendToEditor } = useEditor();
 
   const handleGenerate = async () => {
     if (!aiPrompt.trim()) return;
@@ -65,20 +67,23 @@ export function RightPanel() {
     setIsGenerating(false);
     toast({
       title: 'Content generated! ✨',
-      description: 'Click to copy to editor.',
+      description: 'Click "Send to Editor" to use this content.',
     });
   };
 
-  const copyToEditor = () => {
-    navigator.clipboard.writeText(generatedContent);
+  const handleSendToEditor = () => {
+    if (!generatedContent) return;
+    sendToEditor(`<p>${generatedContent}</p>`);
     toast({
-      title: 'Copied!',
-      description: 'Content copied to clipboard. Paste it in the editor.',
+      title: 'Sent to editor!',
+      description: 'A new post has been created with this content.',
     });
+    setGeneratedContent('');
+    setAiPrompt('');
   };
 
   return (
-    <div className="panel h-full flex flex-col animate-slide-in-right">
+    <div className="h-full flex flex-col">
       {/* Connected Platforms */}
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-3">
@@ -129,7 +134,7 @@ export function RightPanel() {
       </div>
 
       {/* AI Content Assistant */}
-      <div className="flex-1 flex flex-col p-4">
+      <div className="flex-1 flex flex-col p-4 min-h-0">
         <div className="flex items-center gap-2 mb-3">
           <div className="p-1.5 rounded-lg bg-primary/10">
             <Sparkles className="h-4 w-4 text-primary" />
@@ -142,7 +147,7 @@ export function RightPanel() {
           Let AI help you create engaging content based on current trends.
         </p>
 
-        <div className="space-y-3 flex-1 flex flex-col">
+        <div className="space-y-3 flex-1 flex flex-col min-h-0">
           <div className="flex flex-wrap gap-1.5">
             {aiPromptSuggestions.map((suggestion, index) => (
               <Button
@@ -184,15 +189,17 @@ export function RightPanel() {
           </Button>
 
           {generatedContent && (
-            <div
-              className="p-3 rounded-lg bg-primary/5 border border-primary/20 cursor-pointer hover:bg-primary/10 transition-colors"
-              onClick={copyToEditor}
-            >
-              <p className="text-sm mb-2">{generatedContent}</p>
-              <p className="text-xs text-muted-foreground flex items-center gap-1">
-                <ExternalLink className="h-3 w-3" />
-                Click to copy to editor
-              </p>
+            <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+              <p className="text-sm mb-3">{generatedContent}</p>
+              <Button
+                variant="default"
+                size="sm"
+                className="w-full"
+                onClick={handleSendToEditor}
+              >
+                <ArrowRight className="h-4 w-4 mr-2" />
+                Send to Editor
+              </Button>
             </div>
           )}
         </div>
