@@ -2,64 +2,86 @@ import { QueuePanel } from '@/components/dashboard/QueuePanel';
 import { EditorPanel } from '@/components/dashboard/EditorPanel';
 import { RightPanel } from '@/components/dashboard/RightPanel';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { EditorProvider } from '@/contexts/EditorContext';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Bell, Settings, User } from 'lucide-react';
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from '@/components/ui/resizable';
 
 export default function Dashboard() {
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="h-14 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="h-full px-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link to="/">
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-            </Link>
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg btn-gradient flex items-center justify-center">
-                <span className="text-sm font-bold text-primary-foreground">P</span>
+    <EditorProvider>
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        <header className="h-14 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+          <div className="h-full px-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link to="/">
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+              </Link>
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-lg btn-gradient flex items-center justify-center">
+                  <span className="text-sm font-bold text-primary-foreground">P</span>
+                </div>
+                <span className="font-display font-semibold text-lg">PostFlow</span>
               </div>
-              <span className="font-display font-semibold text-lg">PostFlow</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                <Bell className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                <Settings className="h-4 w-4" />
+              </Button>
+              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center ml-2">
+                <User className="h-4 w-4 text-primary" />
+              </div>
             </div>
           </div>
+        </header>
 
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <Button variant="ghost" size="icon" className="h-9 w-9">
-              <Bell className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-9 w-9">
-              <Settings className="h-4 w-4" />
-            </Button>
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center ml-2">
-              <User className="h-4 w-4 text-primary" />
-            </div>
-          </div>
-        </div>
-      </header>
+        {/* Dashboard Content with Resizable Panels */}
+        <div className="h-[calc(100vh-3.5rem)]">
+          <ResizablePanelGroup direction="horizontal" className="h-full">
+            {/* Left Panel - Queue */}
+            <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
+              <div className="h-full p-4 pr-0">
+                <div className="panel h-full animate-slide-in-left">
+                  <QueuePanel />
+                </div>
+              </div>
+            </ResizablePanel>
 
-      {/* Dashboard Content */}
-      <div className="h-[calc(100vh-3.5rem)] p-4">
-        <div className="h-full grid grid-cols-12 gap-4">
-          {/* Left Panel - Queue */}
-          <div className="col-span-12 lg:col-span-3 xl:col-span-3">
-            <QueuePanel />
-          </div>
+            <ResizableHandle withHandle />
 
-          {/* Center Panel - Editor */}
-          <div className="col-span-12 lg:col-span-6 xl:col-span-6">
-            <EditorPanel />
-          </div>
+            {/* Center Panel - Editor */}
+            <ResizablePanel defaultSize={55} minSize={40}>
+              <div className="h-full p-4 animate-slide-up">
+                <EditorPanel />
+              </div>
+            </ResizablePanel>
 
-          {/* Right Panel - Platforms & AI */}
-          <div className="col-span-12 lg:col-span-3 xl:col-span-3">
-            <RightPanel />
-          </div>
+            <ResizableHandle withHandle />
+
+            {/* Right Panel - Platforms & AI */}
+            <ResizablePanel defaultSize={25} minSize={20} maxSize={35}>
+              <div className="h-full p-4 pl-0">
+                <div className="panel h-full animate-slide-in-right">
+                  <RightPanel />
+                </div>
+              </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </div>
       </div>
-    </div>
+    </EditorProvider>
   );
 }
